@@ -1,0 +1,41 @@
+{
+	"cities": [
+		{
+			"name": "Dallas",
+			"x": 0.5,
+			"y": 0.2
+		},
+		{
+			"name": "Sherman",
+			"x": 0.5,
+			"y": 0.8
+		}
+	],
+	"colors": [
+		{
+			"name": "red",
+			"neutral": false,
+			"r": 255,
+			"g": 0,
+			"b": 0
+		},
+		{
+			"name": "green",
+			"neutral": false,
+			"r": 0,
+			"g": 255,
+			"b": 0
+		},
+		{
+			"name": "blue",
+			"neutral": false,
+			"r": 0,
+			"g": 0,
+			"b": 255
+		}
+	],
+	"destinations": [
+	],
+	"routes": [
+	]
+}

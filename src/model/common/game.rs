@@ -4,6 +4,7 @@ use super::destination::{Destination, DestinationDTO};
 use super::route::{Route, RouteDTO};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt::Display;
 
 #[derive(Serialize, Deserialize)]
 pub struct GameDTO {
@@ -29,13 +30,23 @@ pub enum GameCreationError {
     ColorNotFound(String),
 }
 
+impl Display for GameCreationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::CityNotFound(city) => write!(f, "City not found: {}", city),
+            Self::ColorNotFound(color) => write!(f, "Color not found: {}", color),
+        }
+    }
+}
+
 impl GameCommon {
-    pub fn new(
-        cities: Vec<City>,
-        colors: Vec<Color>,
-        destinations: Vec<DestinationDTO>,
-        routes: Vec<RouteDTO>,
-    ) -> Result<Self, GameCreationError> {
+    pub fn new(dto: GameDTO) -> Result<Self, GameCreationError> {
+        let GameDTO {
+            cities,
+            colors,
+            destinations,
+            routes,
+        } = dto;
         let cities_by_name = cities
             .iter()
             .enumerate()

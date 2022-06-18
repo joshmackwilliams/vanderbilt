@@ -1,6 +1,6 @@
 use super::UI;
 use crate::app::AppState;
-use std::io::BufRead;
+use std::io::{BufRead, Write};
 
 pub struct CLI {}
 
@@ -16,6 +16,8 @@ impl UI for CLI {
     }
 
     fn get_input(&mut self, _app_state: &AppState) -> String {
+        print!("> ");
+        std::io::stdout().lock().flush().unwrap();
         std::io::stdin().lock().lines().next().unwrap().unwrap()
     }
 }

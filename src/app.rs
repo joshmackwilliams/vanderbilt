@@ -1,6 +1,6 @@
 use super::commands::command_from_str;
 use super::model::game_builder::GameBuilder;
-use super::ui::cli::CLI;
+use super::ui::tui::TUI;
 use super::ui::UI;
 
 pub enum AppState {
@@ -9,7 +9,7 @@ pub enum AppState {
 }
 
 pub fn run() {
-    let mut ui: Box<dyn UI> = Box::new(CLI::new());
+    let mut ui: Box<dyn UI> = Box::new(TUI::new().expect("Failed to initialize UI"));
     let mut state = AppState::GameNotStarted(GameBuilder::new());
     ui.display_message("Welcome to Vanderbilt!");
     loop {
