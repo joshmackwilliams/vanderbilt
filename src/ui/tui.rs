@@ -1,4 +1,5 @@
-use crate::{app::AppState, model::common::game::GameCommon};
+use crate::app::AppState;
+use crate::model::common::game::GameCommon;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
@@ -58,8 +59,8 @@ impl TUI {
                     .borders(Borders::ALL);
                 if let Some(viz_data) = viz_data {
                     let viz = Canvas::default()
-                        .x_bounds([0.0, 1.0])
-                        .y_bounds([0.0, 1.0])
+                        .x_bounds([0.0, 255.0])
+                        .y_bounds([0.0, 255.0])
                         .block(viz_block)
                         .paint(|ctx| {
                             visualize(ctx, viz_data);
@@ -85,14 +86,18 @@ impl TUI {
 
 fn visualize(ctx: &mut Context, data: &GameCommon) {
     data.routes.iter().for_each(|route| {
-        let from = &data.cities[route.from.0 as usize];
-        let to = &data.cities[route.to.0 as usize];
-        let color = &data.colors[route.color.0 as usize];
-        const LERP_AMOUNT: f32 = 0.03;
-        let x1 = from.x.lerp(to.x, LERP_AMOUNT) as f64;
-        let x2 = to.x.lerp(from.x, LERP_AMOUNT) as f64;
-        let y1 = from.y.lerp(to.y, LERP_AMOUNT) as f64;
-        let y2 = to.y.lerp(from.y, LERP_AMOUNT) as f64;
+        let from = &data.cities[route.from];
+        let to = &data.cities[route.to];
+        let color = &data.colors[route.color];
+        const LERP_AMOUNT: f64 = 0.03;
+        let from_x = from.x as f64;
+        let from_y = from.y as f64;
+        let to_x = to.x as f64;
+        let to_y = to.y as f64;
+        let x1 = from_x.lerp(to_x, LERP_AMOUNT) as f64;
+        let x2 = to_x.lerp(from_x, LERP_AMOUNT) as f64;
+        let y1 = from_y.lerp(to_y, LERP_AMOUNT) as f64;
+        let y2 = to_y.lerp(from_y, LERP_AMOUNT) as f64;
         let color = Color::Rgb(color.r, color.g, color.b);
         ctx.draw(&Line {
             x1,

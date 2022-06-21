@@ -1,42 +1,41 @@
-use super::color::ColorId;
+use super::city::{City, CityName};
+use super::color::ColorName;
 use super::player::PlayerId;
-use super::{city::CityId, game::GameCreationError};
+use super::{color::Color, game::GameCreationError};
+use crate::model::id::Id;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct RouteId(pub u16);
-
 #[derive(Serialize, Deserialize)]
 pub struct RouteDTO {
-    pub from: String,
-    pub to: String,
+    pub from: CityName,
+    pub to: CityName,
     pub length: usize,
-    pub color: String,
-    pub double_color: Option<String>,
+    pub color: ColorName,
+    pub double_color: Option<ColorName>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct RouteDouble {
-    pub color: ColorId,
-    pub owner: Option<PlayerId>,
+    pub color: Id<Color>,
+    pub owner: Option<Id<PlayerId>>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Route {
-    pub from: CityId,
-    pub to: CityId,
+    pub from: Id<City>,
+    pub to: Id<City>,
     pub length: usize,
-    pub color: ColorId,
+    pub color: Id<Color>,
     pub double: Option<RouteDouble>,
-    pub owner: Option<PlayerId>,
+    pub owner: Option<Id<PlayerId>>,
 }
 
 impl Route {
     pub fn new(
         dto: RouteDTO,
-        cities_by_name: &HashMap<String, CityId>,
-        colors_by_name: &HashMap<String, ColorId>,
+        cities_by_name: &HashMap<CityName, Id<City>>,
+        colors_by_name: &HashMap<ColorName, Id<Color>>,
     ) -> Result<Self, GameCreationError> {
         let RouteDTO {
             from,
@@ -52,7 +51,7 @@ impl Route {
         let to = *cities_by_name
             .get(&to)
             .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(GameCreationError::ColorNotFound(to)))?;
+            .unwrap_or_else(|| Result::Err(GameCreationError::CityNotFound(to)))?;
         let color = *colors_by_name
             .get(&color)
             .map(Result::Ok)

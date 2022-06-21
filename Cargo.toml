@@ -10,3 +10,5 @@ rand = "0.8"
 tui = "0.18"
 crossterm = "0.23"
 lerp = "0.4"
+typed-index-collections = { version = "3.0", features = ["alloc", "std", "serde", "serde-alloc", "serde-std"] }
+arrayvec = { version = "0.7", features = ["std", "serde"] }

@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "arrayvec"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -313,6 +322,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "typed-index-collections"
+version = "3.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed2198514940bb6574216fde5d5c349c3f578fa719b225352f0eaaf45983c930"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -334,12 +352,14 @@ checksum = "3ed742d4ea2bd1176e236172c8429aaf54486e7ac098db29ffe6529e0ce50973"
 name = "vanderbilt"
 version = "0.1.0"
 dependencies = [
+ "arrayvec",
  "crossterm",
  "lerp",
  "rand",
  "serde",
  "serde_json",
  "tui",
+ "typed-index-collections",
 ]
 
 [[package]]

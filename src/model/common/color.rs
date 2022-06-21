@@ -1,11 +1,11 @@
+use arrayvec::ArrayString;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ColorId(pub u16);
+pub type ColorName = ArrayString<8>;
 
 #[derive(Serialize, Deserialize)]
 pub struct Color {
-    pub name: String,
+    pub name: ColorName,
     pub neutral: bool,
     pub r: u8,
     pub g: u8,

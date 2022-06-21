@@ -1,33 +1,35 @@
-use super::city::{City, CityId};
-use super::color::{Color, ColorId};
+use super::city::{City, CityName};
+use super::color::{Color, ColorName};
 use super::destination::{Destination, DestinationDTO};
 use super::route::{Route, RouteDTO};
+use crate::model::id::Id;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
+use typed_index_collections::TiVec;
 
 #[derive(Serialize, Deserialize)]
 pub struct GameDTO {
-    pub cities: Vec<City>,
-    pub colors: Vec<Color>,
-    pub routes: Vec<RouteDTO>,
+    pub cities: TiVec<Id<City>, City>,
+    pub colors: TiVec<Id<Color>, Color>,
+    pub routes: TiVec<Id<Route>, RouteDTO>,
     pub destinations: Vec<DestinationDTO>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct GameCommon {
-    pub cities: Vec<City>,
-    pub colors: Vec<Color>,
-    pub destinations: Vec<Destination>,
-    pub routes: Vec<Route>,
+    pub cities: TiVec<Id<City>, City>,
+    pub colors: TiVec<Id<Color>, Color>,
+    pub destinations: TiVec<Id<Destination>, Destination>,
+    pub routes: TiVec<Id<Route>, Route>,
 
-    pub cities_by_name: HashMap<String, CityId>,
-    pub colors_by_name: HashMap<String, ColorId>,
+    pub cities_by_name: HashMap<CityName, Id<City>>,
+    pub colors_by_name: HashMap<ColorName, Id<Color>>,
 }
 
 pub enum GameCreationError {
-    CityNotFound(String),
-    ColorNotFound(String),
+    CityNotFound(CityName),
+    ColorNotFound(ColorName),
 }
 
 impl Display for GameCreationError {
@@ -48,23 +50,21 @@ impl GameCommon {
             routes,
         } = dto;
         let cities_by_name = cities
-            .iter()
-            .enumerate()
-            .map(|(id, city)| (city.name.clone(), CityId(id.try_into().unwrap())))
+            .iter_enumerated()
+            .map(|(id, city)| (city.name, id))
             .collect();
         let colors_by_name = colors
-            .iter()
-            .enumerate()
-            .map(|(id, color)| (color.name.clone(), ColorId(id.try_into().unwrap())))
+            .iter_enumerated()
+            .map(|(id, color)| (color.name, id))
             .collect();
         let destinations = destinations
             .into_iter()
             .map(|destination| Destination::new(destination, &cities_by_name))
-            .collect::<Result<Vec<Destination>, GameCreationError>>()?;
+            .collect::<Result<TiVec<Id<Destination>, Destination>, GameCreationError>>()?;
         let routes = routes
             .into_iter()
             .map(|route| Route::new(route, &cities_by_name, &colors_by_name))
-            .collect::<Result<Vec<Route>, GameCreationError>>()?;
+            .collect::<Result<TiVec<Id<Route>, Route>, GameCreationError>>()?;
         Result::Ok(Self {
             cities,
             colors,

@@ -1,28 +1,29 @@
-use super::{city::CityId, game::GameCreationError};
+use super::{
+    city::{City, CityName},
+    game::GameCreationError,
+};
+use crate::model::id::Id;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DestinationId(pub u16);
-
 #[derive(Serialize, Deserialize)]
 pub struct DestinationDTO {
-    pub from: String,
-    pub to: String,
+    pub from: CityName,
+    pub to: CityName,
     pub points: usize,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Destination {
-    pub from: CityId,
-    pub to: CityId,
+    pub from: Id<City>,
+    pub to: Id<City>,
     pub points: usize,
 }
 
 impl Destination {
     pub fn new(
         dto: DestinationDTO,
-        cities_by_name: &HashMap<String, CityId>,
+        cities_by_name: &HashMap<CityName, Id<City>>,
     ) -> Result<Self, GameCreationError> {
         let DestinationDTO { from, to, points } = dto;
         let from = *match cities_by_name.get(&from) {
