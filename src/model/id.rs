@@ -5,7 +5,7 @@ use std::{marker::PhantomData, num::NonZeroU8};
 #[derive(PartialEq, Eq, Serialize, Deserialize)]
 pub struct Id<T> {
     value: NonZeroU8,
-    _phantom: PhantomData<T>,
+    _phantom: PhantomData<fn(T) -> ()>,
 }
 
 // Have to add these manually instead of deriving for some weird, generic-

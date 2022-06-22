@@ -47,21 +47,23 @@ impl Route {
         let from = *cities_by_name
             .get(&from)
             .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(GameCreationError::CityNotFound(from)))?;
+            .unwrap_or_else(|| Result::Err(GameCreationError::CityNotFoundError(from)))?;
         let to = *cities_by_name
             .get(&to)
             .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(GameCreationError::CityNotFound(to)))?;
+            .unwrap_or_else(|| Result::Err(GameCreationError::CityNotFoundError(to)))?;
         let color = *colors_by_name
             .get(&color)
             .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(GameCreationError::ColorNotFound(color)))?;
+            .unwrap_or_else(|| Result::Err(GameCreationError::ColorNotFoundError(color)))?;
         let double_color = double_color
             .map(|color_name| {
                 colors_by_name
                     .get(&color_name)
                     .map(|color| Result::Ok(*color))
-                    .unwrap_or_else(|| Result::Err(GameCreationError::ColorNotFound(color_name)))
+                    .unwrap_or_else(|| {
+                        Result::Err(GameCreationError::ColorNotFoundError(color_name))
+                    })
             })
             .transpose()?;
         let double = double_color.map(|color| RouteDouble {

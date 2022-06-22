@@ -3,9 +3,10 @@ use super::color::{Color, ColorName};
 use super::destination::{Destination, DestinationDTO};
 use super::route::{Route, RouteDTO};
 use crate::model::id::Id;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fmt::Display;
+use thiserror::Error;
 use typed_index_collections::TiVec;
 
 #[derive(Serialize, Deserialize)]
@@ -27,22 +28,16 @@ pub struct GameCommon {
     pub colors_by_name: HashMap<ColorName, Id<Color>>,
 }
 
+#[derive(Debug, Error)]
 pub enum GameCreationError {
-    CityNotFound(CityName),
-    ColorNotFound(ColorName),
-}
-
-impl Display for GameCreationError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::CityNotFound(city) => write!(f, "City not found: {}", city),
-            Self::ColorNotFound(color) => write!(f, "Color not found: {}", color),
-        }
-    }
+    #[error("City not found: {0}")]
+    CityNotFoundError(CityName),
+    #[error("Color not found: {0}")]
+    ColorNotFoundError(ColorName),
 }
 
 impl GameCommon {
-    pub fn new(dto: GameDTO) -> Result<Self, GameCreationError> {
+    pub fn new(dto: GameDTO) -> Result<Self, Vec<GameCreationError>> {
         let GameDTO {
             cities,
             colors,
@@ -57,22 +52,27 @@ impl GameCommon {
             .iter_enumerated()
             .map(|(id, color)| (color.name, id))
             .collect();
-        let destinations = destinations
+        let (destinations, mut errors): (TiVec<_, _>, Vec<_>) = destinations
             .into_iter()
             .map(|destination| Destination::new(destination, &cities_by_name))
-            .collect::<Result<TiVec<Id<Destination>, Destination>, GameCreationError>>()?;
-        let routes = routes
+            .partition_result();
+        let (routes, mut route_errors): (TiVec<_, _>, Vec<_>) = routes
             .into_iter()
             .map(|route| Route::new(route, &cities_by_name, &colors_by_name))
-            .collect::<Result<TiVec<Id<Route>, Route>, GameCreationError>>()?;
-        Result::Ok(Self {
-            cities,
-            colors,
-            destinations,
-            routes,
+            .partition_result();
+        errors.append(&mut route_errors);
+        if errors.is_empty() {
+            Result::Ok(Self {
+                cities,
+                colors,
+                destinations,
+                routes,
 
-            cities_by_name,
-            colors_by_name,
-        })
+                cities_by_name,
+                colors_by_name,
+            })
+        } else {
+            Result::Err(errors)
+        }
     }
 }

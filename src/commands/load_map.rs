@@ -50,7 +50,7 @@ impl GameCommand for LoadMapCommand {
         let game_state = match GameCommon::new(game_state) {
             Result::Ok(x) => x,
             Result::Err(e) => {
-                ui.display_message(&format!("Error loading game: {}", e));
+                ui.display_message(&format!("Error loading game: {:?}", e));
                 return;
             }
         };
