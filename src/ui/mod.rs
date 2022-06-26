@@ -1,9 +1,10 @@
-use crate::app::AppState;
+use crate::states::AppState;
 
 pub mod cli;
 pub mod tui;
 
 pub trait UI {
     fn display_message(&mut self, message: &str);
-    fn get_input(&mut self, app_state: &AppState) -> String;
+    fn display_error(&mut self, error: &str);
+    fn get_input(&mut self, state: &dyn AppState) -> String;
 }

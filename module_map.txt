@@ -1,0 +1,41 @@
+vanderbilt
+- ui
+  - parsing
+  - cli
+  - tui
+    - viz
+	- input
+	- info
+- commands
+  - exit
+  - invalid
+  - load_map
+  - (etc)
+- model
+  - data
+	- map
+	- city
+	- color
+	- route
+	- destination
+	- deck
+	- physicalplayer
+	- simulatedplayer
+	- physicalgame
+	- simulatedgame
+  - views
+    - moving
+	- scoring
+	- add_player
+	- change_map_view
+    - (etc)
+  - states
+	- unknownsetup
+	- physicalsetup
+	- physicalreview
+	- physicalinprogress
+	- physicalfinalizing
+	- simulatedsetup
+	- simulatedreview
+	- simulatedinprogress
+	- completed

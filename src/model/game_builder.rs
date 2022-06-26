@@ -1,7 +1,7 @@
-use super::common::game::GameCommon;
+use super::game::GameMap;
 
 pub struct GameBuilder {
-    pub common: Option<GameCommon>,
+    pub common: Option<GameMap>,
 }
 
 impl GameBuilder {

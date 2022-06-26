@@ -1,7 +1,6 @@
-use super::GameCommand;
-use crate::app::AppState;
-use crate::model::common::game::{GameCommon, GameDTO};
-use crate::model::game_builder::GameBuilder;
+use super::AppCommand;
+use crate::model::game::{GameMap, GameMapDTO};
+use crate::states::AppState;
 use crate::ui::UI;
 use std::fs::read_to_string;
 
@@ -17,50 +16,55 @@ impl LoadMapCommand {
     }
 }
 
-impl GameCommand for LoadMapCommand {
-    fn execute(mut self: Box<Self>, app_state: &mut AppState, ui: &mut dyn UI) {
-        let builder: &mut GameBuilder = match app_state {
-            AppState::GameNotStarted(builder) => builder,
-            _ => {
-                ui.display_message("This command is not available right now");
-                return;
+impl AppCommand for LoadMapCommand {
+    fn execute(
+        mut self: Box<Self>,
+        mut state: Box<dyn AppState>,
+        ui: &mut dyn UI,
+    ) -> Box<dyn AppState> {
+        let mut load_map_view = match state.load_map_view() {
+            Some(v) => v,
+            None => {
+                ui.display_error("This command is not available");
+                return state;
             }
         };
         let filename = match self.filename.take() {
             Option::Some(filename) => filename,
             Option::None => {
                 ui.display_message("Please provide a filename!");
-                return;
+                return state;
             }
         };
-        let game_state: String = match read_to_string(&filename) {
+        let map: String = match read_to_string(&filename) {
             Result::Ok(x) => x,
             Result::Err(e) => {
                 ui.display_message(&format!("Error reading from {}: {}", filename, e));
-                return;
+                return state;
             }
         };
-        let game_state: GameDTO = match serde_json::de::from_str(&game_state) {
+        let map: GameMapDTO = match serde_json::de::from_str(&map) {
             Result::Ok(x) => x,
             Result::Err(e) => {
                 ui.display_message(&format!("Error parsing map file: {}", e));
-                return;
+                return state;
             }
         };
-        let game_state = match GameCommon::new(game_state) {
+        let map = match GameMap::new(map) {
             Result::Ok(x) => x,
             Result::Err(e) => {
                 ui.display_message(&format!("Error loading game: {:?}", e));
-                return;
+                return state;
             }
         };
         ui.display_message(&format!(
             "Loaded {} colors, {} cities, {} routes, and {} destinations",
-            game_state.colors.len(),
-            game_state.cities.len(),
-            game_state.routes.len(),
-            game_state.destinations.len()
+            map.colors.colors().len(),
+            map.cities.cities().len(),
+            map.routes.len(),
+            map.destinations.len()
         ));
-        builder.common = Option::Some(game_state);
+        load_map_view.load(map);
+        state
     }
 }

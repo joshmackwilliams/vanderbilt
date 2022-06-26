@@ -1,5 +1,5 @@
-use crate::app::AppState;
-use crate::model::common::game::GameCommon;
+use crate::states::AppState;
+use crate::{model::game::GameMap, views::VisualizeView};
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
@@ -34,7 +34,8 @@ impl TUI {
         let mut stdout = io::stdout();
         execute!(stdout, EnterAlternateScreen, EnableMouseCapture).ok();
         let backend = CrosstermBackend::new(stdout);
-        let terminal = Terminal::new(backend)?;
+        let mut terminal = Terminal::new(backend)?;
+        terminal.clear().ok();
         Result::Ok(Self {
             terminal,
             user_input: String::new(),
@@ -43,11 +44,8 @@ impl TUI {
         })
     }
 
-    fn redraw(&mut self, state: &AppState) {
-        let viz_data = match state {
-            AppState::GameNotStarted(builder) => builder.common.as_ref(),
-            _ => None,
-        };
+    fn redraw(&mut self, state: &dyn AppState) {
+        let viz_data = state.visualize_view().as_ref().map(VisualizeView::map);
         self.terminal
             .draw(|f| {
                 let chunks = Layout::default()
@@ -84,21 +82,21 @@ impl TUI {
     }
 }
 
-fn visualize(ctx: &mut Context, data: &GameCommon) {
+fn visualize(ctx: &mut Context, data: &GameMap) {
     data.routes.iter().for_each(|route| {
-        let from = &data.cities[route.from];
-        let to = &data.cities[route.to];
-        let color = &data.colors[route.color];
+        let from = &data.cities.cities()[route.from()];
+        let to = &data.cities.cities()[route.to()];
+        let color = &data.colors.colors()[route.color()];
         const LERP_AMOUNT: f64 = 0.03;
-        let from_x = from.x as f64;
-        let from_y = from.y as f64;
-        let to_x = to.x as f64;
-        let to_y = to.y as f64;
+        let from_x = from.x() as f64;
+        let from_y = from.y() as f64;
+        let to_x = to.x() as f64;
+        let to_y = to.y() as f64;
         let x1 = from_x.lerp(to_x, LERP_AMOUNT) as f64;
         let x2 = to_x.lerp(from_x, LERP_AMOUNT) as f64;
         let y1 = from_y.lerp(to_y, LERP_AMOUNT) as f64;
         let y2 = to_y.lerp(from_y, LERP_AMOUNT) as f64;
-        let color = Color::Rgb(color.r, color.g, color.b);
+        let color = Color::Rgb(color.r(), color.g(), color.b());
         ctx.draw(&Line {
             x1,
             y1,
@@ -108,12 +106,12 @@ fn visualize(ctx: &mut Context, data: &GameCommon) {
         });
     });
     ctx.layer();
-    data.cities.iter().for_each(|city| {
+    data.cities.cities().iter().for_each(|city| {
         ctx.print(
-            city.x as f64,
-            city.y as f64,
+            city.x() as f64,
+            city.y() as f64,
             Span::styled(
-                format!("• {}", &city.name),
+                format!("• {}", city.name()),
                 Style::default().fg(Color::White),
             ),
         );
@@ -134,7 +132,7 @@ impl Drop for TUI {
 }
 
 impl UI for TUI {
-    fn get_input(&mut self, app_state: &AppState) -> String {
+    fn get_input(&mut self, app_state: &dyn AppState) -> String {
         self.redraw(app_state);
         loop {
             if let Event::Key(key) = event::read().expect("Error reading terminal") {
@@ -163,5 +161,9 @@ impl UI for TUI {
     }
     fn display_message(&mut self, message: &str) {
         self.message = message.to_owned();
+    }
+
+    fn display_error(&mut self, error: &str) {
+        self.display_message(error);
     }
 }

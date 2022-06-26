@@ -14,3 +14,11 @@ crossterm = "0.23"
 lerp = "0.4"
 typed-index-collections = { version = "3.0", features = ["alloc", "std", "serde", "serde-alloc", "serde-std"] }
 arrayvec = { version = "0.7", features = ["std", "serde"] }
+getset = "0.1"
+derive_more = "0.99"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+

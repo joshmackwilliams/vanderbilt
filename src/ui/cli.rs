@@ -1,5 +1,5 @@
 use super::UI;
-use crate::app::AppState;
+use crate::states::AppState;
 use std::io::{BufRead, Write};
 
 pub struct CLI {}
@@ -15,10 +15,14 @@ impl UI for CLI {
         println!("{}", message);
     }
 
-    fn get_input(&mut self, _app_state: &AppState) -> String {
+    fn get_input(&mut self, _app_state: &dyn AppState) -> String {
         print!("> ");
         std::io::stdout().lock().flush().unwrap();
         std::io::stdin().lock().lines().next().unwrap().unwrap()
+    }
+
+    fn display_error(&mut self, error: &str) {
+        self.display_message(error);
     }
 }
 

@@ -1,19 +1,19 @@
-use super::app::AppState;
-use crate::ui::UI;
+use crate::{states::AppState, ui::UI};
 
-pub mod exit;
-pub mod invalid;
-pub mod load_map;
+mod exit;
+mod invalid;
+mod load_map;
 
 pub use exit::ExitCommand;
 pub use invalid::InvalidCommand;
 pub use load_map::LoadMapCommand;
 
-pub trait GameCommand {
-    fn execute(self: Box<Self>, app_state: &mut AppState, ui: &mut dyn UI);
+pub trait AppCommand {
+    fn execute(self: Box<Self>, app_state: Box<dyn AppState>, ui: &mut dyn UI)
+        -> Box<dyn AppState>;
 }
 
-pub fn command_from_str(command: &str) -> Box<dyn GameCommand> {
+pub fn command_from_str(command: &str) -> Box<dyn AppCommand> {
     let mut command = command.split(' ');
     match command.next() {
         Option::Some("exit") => Box::new(ExitCommand::new()),
