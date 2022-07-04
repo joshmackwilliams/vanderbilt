@@ -1,7 +1,5 @@
 use super::AppCommand;
-use crate::states::AppState;
-use crate::states::ExitState;
-use crate::ui::UI;
+use crate::{app::App, states::ExitState};
 
 pub struct ExitCommand {}
 
@@ -12,9 +10,10 @@ impl ExitCommand {
 }
 
 impl AppCommand for ExitCommand {
-    fn execute(self: Box<Self>, _state: Box<dyn AppState>, ui: &mut dyn UI) -> Box<dyn AppState> {
-        ui.display_message("Exiting...");
-        Box::new(ExitState::new())
+    fn execute(self: Box<Self>, app: &mut App) -> Result<(), String> {
+        app.ui.display_message("Exiting...");
+        app.state = Box::new(ExitState::new());
+        Result::Ok(())
     }
 }
 

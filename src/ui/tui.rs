@@ -1,5 +1,5 @@
 use crate::states::AppState;
-use crate::{model::game::GameMap, views::VisualizeView};
+use crate::{model::game_map::GameMap, views::VisualizeView};
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
@@ -25,6 +25,7 @@ pub struct TUI {
     terminal: Terminal<CrosstermBackend<Stdout>>,
     user_input: String,
     message: String,
+    message_style: Style,
     previous_input: String,
 }
 
@@ -40,6 +41,7 @@ impl TUI {
             terminal,
             user_input: String::new(),
             message: String::new(),
+            message_style: Style::default(),
             previous_input: String::new(),
         })
     }
@@ -68,7 +70,11 @@ impl TUI {
                     f.render_widget(viz_block, chunks[0]);
                 }
                 let input_box = Block::default()
-                    .title(self.message.clone())
+                    .title(Spans::from(vec![
+                        Span::raw(" "),
+                        Span::styled(&self.message, self.message_style),
+                        Span::raw(" "),
+                    ]))
                     .borders(Borders::ALL);
                 let user_input = Paragraph::new(Spans::from(vec![
                     Span::styled(" > ", Style::default().add_modifier(Modifier::BOLD)),
@@ -161,9 +167,11 @@ impl UI for TUI {
     }
     fn display_message(&mut self, message: &str) {
         self.message = message.to_owned();
+        self.message_style = Style::default();
     }
 
     fn display_error(&mut self, error: &str) {
         self.display_message(error);
+        self.message_style = Style::default().fg(Color::Red).add_modifier(Modifier::BOLD);
     }
 }

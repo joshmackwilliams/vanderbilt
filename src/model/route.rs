@@ -1,6 +1,6 @@
 use super::city::{Cities, City, CityName};
 use super::color::{ColorName, Colors};
-use super::{color::Color, game::GameMapCreationError};
+use super::{color::Color, game_map::GameMapCreationError};
 use crate::errors::{CityNotFoundError, ColorNotFoundError};
 use crate::model::id::Id;
 use derive_more::From;
@@ -63,22 +63,18 @@ impl Route {
         } = dto;
         let from = cities
             .by_name(&from)
-            .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(CityNotFoundError::from(from)))?;
+            .ok_or_else(|| CityNotFoundError::from(from))?;
         let to = cities
             .by_name(&to)
-            .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(CityNotFoundError::from(to)))?;
+            .ok_or_else(|| CityNotFoundError::from(to))?;
         let color = colors
             .by_name(&color)
-            .map(Result::Ok)
-            .unwrap_or_else(|| Result::Err(ColorNotFoundError::from(color)))?;
+            .ok_or_else(|| ColorNotFoundError::from(color))?;
         let double_color = double_color
             .map(|color_name| {
                 colors
                     .by_name(&color_name)
-                    .map(Result::Ok)
-                    .unwrap_or_else(|| Result::Err(ColorNotFoundError::from(color_name)))
+                    .ok_or_else(|| ColorNotFoundError::from(color_name))
             })
             .transpose()?;
         Result::Ok(Self {

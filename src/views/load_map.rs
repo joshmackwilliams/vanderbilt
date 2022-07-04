@@ -1,4 +1,4 @@
-use crate::model::game::GameMap;
+use crate::model::game_map::GameMap;
 
 pub struct LoadMapView<'a> {
     map: &'a mut Option<GameMap>,
@@ -9,7 +9,7 @@ impl<'a> LoadMapView<'a> {
         Self { map }
     }
 
-    pub fn load(&mut self, map: GameMap) {
-        *self.map = Option::Some(map);
+    pub fn load(&mut self, map: Option<GameMap>) -> Option<GameMap> {
+        std::mem::replace(self.map, map)
     }
 }

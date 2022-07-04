@@ -1,4 +1,4 @@
-use crate::model::game::GameMap;
+use crate::model::game_map::GameMap;
 
 pub struct VisualizeView<'a> {
     map: &'a GameMap,

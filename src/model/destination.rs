@@ -1,6 +1,6 @@
 use super::{
     city::{Cities, City, CityName},
-    game::GameMapCreationError,
+    game_map::GameMapCreationError,
 };
 use crate::{errors::CityNotFoundError, model::id::Id};
 use derive_more::From;
@@ -40,10 +40,10 @@ impl Destination {
         let DestinationDTO { from, to, points } = dto;
         let from = cities
             .by_name(&from)
-            .map_or_else(|| Result::Err(CityNotFoundError::from(from)), Result::Ok)?;
+            .ok_or_else(|| CityNotFoundError::from(from))?;
         let to = cities
             .by_name(&to)
-            .map_or_else(|| Result::Err(CityNotFoundError::from(to)), Result::Ok)?;
+            .ok_or_else(|| CityNotFoundError::from(to))?;
         Result::Ok(Self { from, to, points })
     }
 }

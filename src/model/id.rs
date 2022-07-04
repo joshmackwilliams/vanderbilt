@@ -47,29 +47,28 @@ impl<T> From<usize> for Id<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::common::city::City;
     use std::mem::size_of;
 
     // Test the size of the Id when wrapped in an Option
     #[test]
     fn test_optional_id_size() {
-        assert_eq!(1, size_of::<Option<Id<City>>>());
+        assert_eq!(1, size_of::<Option<Id<()>>>());
     }
 
     // Test edge cases
     #[test]
     fn test_create_zero() {
-        let _ = Id::<City>::from(0);
+        let _ = Id::<()>::from(0);
     }
 
     #[test]
     fn test_create_254() {
-        let _ = Id::<City>::from(254);
+        let _ = Id::<()>::from(254);
     }
 
     #[test]
     #[should_panic]
     fn test_create_255() {
-        let _ = Id::<City>::from(255);
+        let _ = Id::<()>::from(255);
     }
 }

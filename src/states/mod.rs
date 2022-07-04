@@ -1,13 +1,10 @@
 mod exit;
-mod generic_setup;
+mod setup;
 
 pub use exit::ExitState;
-pub use generic_setup::GenericSetupState;
+pub use setup::SetupState;
 
-use crate::{
-    transitions::SetupSimulatedTransition,
-    views::{LoadMapView, VisualizeView},
-};
+use crate::views::{LoadMapView, VisualizeView};
 
 pub trait AppState {
     fn load_map_view(&mut self) -> Option<LoadMapView<'_>> {
@@ -17,10 +14,6 @@ pub trait AppState {
     fn visualize_view(&self) -> Option<VisualizeView<'_>> {
         Option::None
     }
-
-    fn setup_simulated_transition(
-        self: Box<Self>,
-    ) -> Result<Box<dyn SetupSimulatedTransition>, Box<dyn AppState>>;
 
     fn should_exit(&self) -> bool {
         false
