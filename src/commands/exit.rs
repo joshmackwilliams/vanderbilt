@@ -7,12 +7,10 @@ impl ExitCommand {
     pub fn new() -> Self {
         Self {}
     }
-}
 
-impl AppCommand for ExitCommand {
-    fn execute(self: Box<Self>, app: &mut App) -> Result<(), String> {
+    pub fn execute(self, app: &mut App) -> Result<(), String> {
         app.ui.display_message("Exiting...");
-        app.state = Box::new(ExitState::new());
+        app.state = ExitState::new().into();
         Result::Ok(())
     }
 }
@@ -20,5 +18,11 @@ impl AppCommand for ExitCommand {
 impl Default for ExitCommand {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl From<ExitCommand> for AppCommand {
+    fn from(state: ExitCommand) -> Self {
+        Self::ExitCommand(state)
     }
 }

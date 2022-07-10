@@ -12,15 +12,15 @@ pub fn run() {
 }
 
 pub struct App {
-    pub state: Box<dyn AppState>,
+    pub state: AppState,
     pub ui: Box<dyn UI>,
-    pub undo: Vec<Box<dyn AppCommand>>,
+    pub undo: Vec<AppCommand>,
 }
 
 impl App {
     fn new(ui: Box<dyn UI>) -> Self {
         Self {
-            state: Box::new(SetupState::new()),
+            state: SetupState::new().into(),
             ui,
             undo: Vec::new(),
         }
@@ -29,7 +29,7 @@ impl App {
     fn run(mut self) {
         self.ui.display_message("Welcome to Vanderbilt!");
         while !self.state.should_exit() {
-            let command = command_from_str(&self.ui.get_input(self.state.as_ref()));
+            let command = command_from_str(&self.ui.get_input(&self.state));
             if let Result::Err(e) = command.execute(&mut self) {
                 self.ui.display_error(&e);
             }

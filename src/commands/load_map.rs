@@ -14,10 +14,8 @@ impl LoadMapCommand {
             filename: args.next().map(String::from),
         }
     }
-}
 
-impl AppCommand for LoadMapCommand {
-    fn execute(self: Box<Self>, app: &mut App) -> Result<(), String> {
+    pub fn execute(self, app: &mut App) -> Result<(), String> {
         let mut load_map_view = match app.state.load_map_view() {
             Some(v) => v,
             None => {
@@ -40,7 +38,13 @@ impl AppCommand for LoadMapCommand {
             map.destinations.len()
         ));
         let map = load_map_view.load(Option::Some(map));
-        app.undo.push(Box::new(UndoLoadMapCommand::new(map)));
+        app.undo.push(UndoLoadMapCommand::new(map).into());
         Result::Ok(())
+    }
+}
+
+impl From<LoadMapCommand> for AppCommand {
+    fn from(state: LoadMapCommand) -> Self {
+        Self::LoadMapCommand(state)
     }
 }

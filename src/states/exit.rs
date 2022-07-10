@@ -1,4 +1,4 @@
-use super::AppState;
+use super::{AppState, AppStateTrait};
 
 #[derive(Default)]
 pub struct ExitState {}
@@ -9,8 +9,14 @@ impl ExitState {
     }
 }
 
-impl AppState for ExitState {
+impl AppStateTrait for ExitState {
     fn should_exit(&self) -> bool {
         true
+    }
+}
+
+impl From<ExitState> for AppState {
+    fn from(state: ExitState) -> Self {
+        Self::ExitState(state)
     }
 }

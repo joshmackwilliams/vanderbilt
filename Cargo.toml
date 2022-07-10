@@ -16,6 +16,7 @@ typed-index-collections = { version = "3.0", features = ["alloc", "std", "serde"
 arrayvec = { version = "0.7", features = ["std", "serde"] }
 getset = "0.1"
 derive_more = "0.99"
+trait_enum = "0.5"
 
 [profile.release]
 lto = "fat"

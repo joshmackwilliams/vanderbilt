@@ -46,7 +46,7 @@ impl TUI {
         })
     }
 
-    fn redraw(&mut self, state: &dyn AppState) {
+    fn redraw(&mut self, state: &AppState) {
         let viz_data = state.visualize_view().as_ref().map(VisualizeView::map);
         self.terminal
             .draw(|f| {
@@ -55,7 +55,7 @@ impl TUI {
                     .constraints([Constraint::Min(0), Constraint::Length(3)])
                     .split(f.size());
                 let viz_block = Block::default()
-                    .title("Visualization")
+                    .title(" Visualization ")
                     .borders(Borders::ALL);
                 if let Some(viz_data) = viz_data {
                     let viz = Canvas::default()
@@ -138,7 +138,7 @@ impl Drop for TUI {
 }
 
 impl UI for TUI {
-    fn get_input(&mut self, app_state: &dyn AppState) -> String {
+    fn get_input(&mut self, app_state: &AppState) -> String {
         self.redraw(app_state);
         loop {
             if let Event::Key(key) = event::read().expect("Error reading terminal") {

@@ -12,16 +12,32 @@ pub use load_map::LoadMapCommand;
 pub use undo::UndoCommand;
 pub use undo_load_map::UndoLoadMapCommand;
 
-pub trait AppCommand {
-    fn execute(self: Box<Self>, app: &mut App) -> Result<(), String>;
+pub enum AppCommand {
+    ExitCommand(ExitCommand),
+    InvalidCommand(InvalidCommand),
+    LoadMapCommand(LoadMapCommand),
+    UndoCommand(UndoCommand),
+    UndoLoadMapCommand(UndoLoadMapCommand),
 }
 
-pub fn command_from_str(command: &str) -> Box<dyn AppCommand> {
+impl AppCommand {
+    pub fn execute(self, app: &mut App) -> Result<(), String> {
+        match self {
+            Self::ExitCommand(x) => x.execute(app),
+            Self::InvalidCommand(x) => x.execute(app),
+            Self::LoadMapCommand(x) => x.execute(app),
+            Self::UndoCommand(x) => x.execute(app),
+            Self::UndoLoadMapCommand(x) => x.execute(app),
+        }
+    }
+}
+
+pub fn command_from_str(command: &str) -> AppCommand {
     let mut command = command.split(' ');
     match command.next() {
-        Option::Some("exit") => Box::new(ExitCommand::new()),
-        Option::Some("load_map") => Box::new(LoadMapCommand::new(command)),
-        Option::Some("undo") => Box::new(UndoCommand::new()),
-        _ => Box::new(InvalidCommand::new()),
+        Option::Some("exit") => ExitCommand::new().into(),
+        Option::Some("load_map") => LoadMapCommand::new(command).into(),
+        Option::Some("undo") => UndoCommand::new().into(),
+        _ => InvalidCommand::new().into(),
     }
 }

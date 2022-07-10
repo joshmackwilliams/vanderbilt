@@ -15,7 +15,7 @@ impl UI for CLI {
         println!("{}", message);
     }
 
-    fn get_input(&mut self, _app_state: &dyn AppState) -> String {
+    fn get_input(&mut self, _app_state: &AppState) -> String {
         print!("> ");
         std::io::stdout().lock().flush().unwrap();
         std::io::stdin().lock().lines().next().unwrap().unwrap()
